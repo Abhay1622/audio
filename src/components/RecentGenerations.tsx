@@ -49,7 +49,7 @@ export const RecentGenerations: React.FC<RecentGenerationsProps> = ({
                   {item.voiceName}
                 </span>
                 <span className="text-[10px] px-1.5 py-0.2 rounded bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-300 font-medium">
-                  {item.language === 'hi' ? 'HI' : item.language === 'bho' ? 'BHO' : 'EN'}
+                  {item.language === 'hi' ? 'HI' : item.language === 'bho' ? 'BHO' : item.language === 'hinglish' ? 'HINGLISH' : 'EN'}
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 flex items-center space-x-1 mt-0.5">

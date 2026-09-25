@@ -38,7 +38,7 @@ export const Navbar: React.FC = () => {
 
           <div className="hidden lg:flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
             <Globe className="w-3.5 h-3.5 text-indigo-500" />
-            <span>Hindi + Bhojpuri (भोजपुरी) + English</span>
+            <span>Hindi + Bhojpuri + Hinglish + English</span>
           </div>
         </div>
       </div>

@@ -1,46 +1,50 @@
-# VoiceCraft — Free AI Text to Speech (Hindi, Bhojpuri & English)
+# VoiceCraft — Free AI Text to Speech (Hindi, Bhojpuri, Hinglish & English)
 
 VoiceCraft is a modern, responsive, and completely **free** AI Text-to-Speech (TTS) web application built with **Next.js 16**, **React 19**, **TypeScript**, and **Tailwind CSS**.
 
-It supports natural-sounding neural speech synthesis for **Hindi (हिन्दी)**, **Bhojpuri (भोजपुरी)**, and **English**, along with **real-time multi-language live translation** and instant audio generation & playback with **zero paid API keys required**.
+It features a **single, unified editor input area** with instant tab switching across **Hindi (हिन्दी)**, **Bhojpuri (भोजपुरी)**, **Hinglish (Roman Hindi)**, and **English**, coupled with **real-time live auto-translation**, **natural human breath pauses**, **emotion profiles**, and **instant audio playback with zero paid API keys**.
 
 ---
 
 ## 🌟 Key Features
 
-1. **Multi-Language Support**:
-   - **Hindi (हिन्दी)**: Natural neural voices (`Swara`, `Madhur`).
-   - **Bhojpuri (भोजपुरी)**: Devanagari neural voices (`Swara`, `Madhur`) tuned for authentic pronunciation.
-   - **English**: Indian English (`Neerja Expressive`, `Prabhat`), US English (`Jenny`, `Guy`), and British English (`Sonia`, `Ryan`).
+1. **4 Language & Voice Tabs in One Single Editor**:
+   - **Hindi (हिन्दी)**: Neural Devanagari models (`Swara`, `Madhur`).
+   - **Bhojpuri (भोजपुरी)**: Authentic regional pronunciation (`Swara`, `Madhur`).
+   - **Hinglish (Roman Hindi)**: Natural Indian cadence reading Romanized Hindi (`Neerja Expressive`, `Prabhat`).
+   - **English**: Indian English (`Neerja`, `Prabhat`), US English (`Jenny`, `Guy`), and UK English (`Sonia`, `Ryan`).
 
-2. **Real-time Live Auto-Translation**:
-   - Type or paste text in **any** language (Hindi, Bhojpuri, or English).
-   - VoiceCraft immediately translates the text across the other two languages in real-time.
-   - Edit each language independently or leave Live Auto-Translate enabled.
+2. **Clean Single Editor UX**:
+   - One focused, modern editor area instead of cluttered stacked boxes.
+   - Switch between **Hindi**, **Bhojpuri**, **Hinglish**, and **English** tabs seamlessly to inspect or adjust text.
+   - Real-time **Live Auto-Translate** automatically keeps all language tabs in sync as you type.
 
-3. **Instant "Generate & Play"**:
-   - Click **Generate & Play** on any language card to synthesize and play speech immediately.
-   - Sleek custom audio player with interactive scrubber, waveform visualizer, volume/mute, and playback speed controls.
+3. **Natural Human Pauses & Cadence**:
+   - **`⏸️ Short (,)`**: Inserts a natural conversational comma pause (~0.3s).
+   - **`💭 Breath (...)`**: Inserts a thoughtful breathing pause (~0.5s).
+   - **`🎭 Dramatic (—)`**: Inserts a dramatic suspension pause (~0.8s).
+   - **`✨ Auto-Humanize`**: Automatically adds breath rhythm and punctuation to prevent robotic delivery.
 
-4. **Audio Download**:
-   - One-click direct **MP3 audio download** with clean file names (e.g., `voicecraft-hindi-swara.mp3`, `voicecraft-bhojpuri-swara.mp3`).
+4. **6 Speaking Emotion & Expression Profiles**:
+   - 🌟 **Natural Human**: Balanced, warm conversational tone.
+   - 🎉 **Cheerful & Excited**: Bright pitch (+8Hz), lively tempo (1.06x), and enthusiastic intonation.
+   - 📖 **Storyteller & Dramatic**: Deep vocal resonance (-10Hz) and suspenseful pacing (0.88x).
+   - 🧘 **Calm & Empathetic**: Soothing tempo (0.84x) and gentle, warm pitch.
+   - 🎙️ **News & Professional**: Crisp, articulate broadcast delivery (1.04x).
+   - 🤫 **Soft & Intimate**: Quiet, close-mic vocal presence (0.82x).
 
-5. **Speech Customization**:
-   - **Speed Control**: Fine slider (0.5x to 2.0x) with quick presets (`0.75x`, `1.0x`, `1.25x`, `1.5x`).
-   - **Pitch Adjustment**: `-20Hz` to `+20Hz` voice pitch tuning.
-   - **Engine Selector**: Edge Neural TTS (Default High-Definition), Google Translate Speech (Fallback), and Browser Web Speech API (Client-side offline).
+5. **Instant "Generate & Play"**:
+   - Click the prominent CTA to immediately synthesize speech for the active tab and play it in the sleek custom audio player with waveform animations.
 
-6. **100% Free & Open**:
-   - **Zero paid API keys** (no OpenAI, ElevenLabs, or GCP billing needed).
-   - Runs completely locally.
+6. **Direct MP3 Audio Download**:
+   - Download audio files with clean names (e.g., `voicecraft-hinglish-neerja.mp3`, `voicecraft-hindi-swara.mp3`).
+
+7. **100% Free & Open (Zero Paid API Keys)**:
+   - Uses Microsoft Edge Neural TTS service, Google Translate Speech fallback, and Browser Web Speech API.
 
 ---
 
 ## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 18+ (tested on Node.js 22)
-- npm 9+
 
 ### 1. Install Dependencies
 ```bash
@@ -62,99 +66,13 @@ npm run start
 
 ---
 
-## 🏗️ Architecture & TTS Provider Abstraction
-
-VoiceCraft is built around an extensible provider pattern (`ITTSProvider` interface):
-
-```
-                       ┌────────────────────────┐
-                       │   Next.js API Handler  │
-                       │   /api/tts/generate    │
-                       └───────────┬────────────┘
-                                   │
-                           ┌───────▼──────┐
-                           │  TTSManager  │
-                           └───────┬──────┘
-                                   │
-          ┌────────────────────────┼────────────────────────┐
-          │                        │                        │
-┌─────────▼─────────┐    ┌─────────▼─────────┐    ┌─────────▼─────────┐
-│  EdgeTTSProvider  │    │ GoogleTTSProvider │    │BrowserSpeechClient│
-│  (Neural Engine)  │    │(Fallback Provider)│    │(Client-Side Audio)│
-└───────────────────┘    └───────────────────┘    └───────────────────┘
-```
-
-- **`EdgeTTSProvider`**: Primary engine connecting to Microsoft Edge's Read Aloud neural speech service over WebSocket. Delivers human-like cadence, pitch, and speed adjustments.
-- **`GoogleTTSProvider`**: Automatic fallback engine over HTTPS providing reliable speech synthesis if WebSocket connections are firewalled.
-- **`BrowserSpeechClient`**: In-browser speech synthesis using the Web Speech API (`window.speechSynthesis`) for zero-network playback.
-
----
-
 ## 📡 API Endpoints
 
-### 1. Generate Speech
-- **Endpoint**: `POST /api/tts/generate`
-- **Body**:
-  ```json
-  {
-    "text": "नमस्ते, आपका स्वागत है वॉइसक्राफ्ट में।",
-    "language": "hi",
-    "voice": "hi-IN-SwaraNeural",
-    "speed": 1.0,
-    "pitch": 0,
-    "provider": "edge-tts"
-  }
-  ```
-- **Response**:
-  ```json
-  {
-    "success": true,
-    "audioUrl": "/api/tts/audio/da4f31ac-af1f-4ea3-8db7-248cc1e3edea",
-    "mimeType": "audio/mpeg",
-    "format": "mp3",
-    "language": "hi",
-    "voice": "hi-IN-SwaraNeural",
-    "duration": 3.8,
-    "characterCount": 42
-  }
-  ```
-
-### 2. Stream Audio
-- **Endpoint**: `GET /api/tts/audio/:id`
-- Streams cached MP3 audio with `Content-Type: audio/mpeg` and `Accept-Ranges: bytes`.
-
-### 3. Real-Time Translation
-- **Endpoint**: `POST /api/translate`
-- **Body**:
-  ```json
-  {
-    "text": "Hello, welcome to VoiceCraft.",
-    "sourceLang": "en"
-  }
-  ```
-- **Response**:
-  ```json
-  {
-    "success": true,
-    "translations": {
-      "hi": "नमस्ते, वॉइसक्राफ्ट में आपका स्वागत है।",
-      "bho": "प्रणाम, VoiceCraft में राउर स्वागत बा।"
-    }
-  }
-  ```
-
-### 4. Voices & Status
-- `GET /api/tts/voices?language=hi|bho|en`
-- `GET /api/tts/status`
-
----
-
-## 🔒 Security & Privacy
-
-- Character limit enforced server-side (max 5,000 characters).
-- Temporary audio clips cached in memory with automatic 30-minute TTL cleanup to prevent unbounded resource consumption.
-- Input validation sanitizes requests and prevents code injection.
-- Zero credential exposure: no third-party API keys are stored or exposed.
+- `POST /api/tts/generate`: Synthesizes speech (`hi`, `bho`, `hinglish`, `en`).
+- `GET /api/tts/audio/:id`: Streams cached MP3 audio bytes.
+- `POST /api/translate`: Real-time translation and Hinglish transliteration.
+- `GET /api/tts/voices?language=...`: List voices by language.
+- `GET /api/tts/status`: Provider health check.
 
 ---
 

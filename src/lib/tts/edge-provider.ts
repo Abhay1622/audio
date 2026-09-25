@@ -1,6 +1,7 @@
 import { ITTSProvider } from './types';
 import { SupportedLanguage, TTSGenerateRequest, TTSGenerateResult, TTSProviderStatus, TTSVoice } from '@/types/tts';
 import { EdgeTTS } from '@andresaya/edge-tts';
+import { humanizeSpeechText, EMOTION_PROFILES, SpeakingEmotion } from './humanizer';
 
 const KNOWN_VOICES: TTSVoice[] = [
   // Hindi voices
@@ -46,6 +47,28 @@ const KNOWN_VOICES: TTSVoice[] = [
     gender: 'Male',
     provider: 'edge-tts',
     accent: 'Bhojpuri (भोजपुरी)',
+  },
+  // Hinglish voices (Indian English Neural models with native Hindi phonetic articulation)
+  {
+    id: 'hinglish-IN-NeerjaNeural',
+    name: 'Neerja (Hinglish)',
+    friendlyName: 'Neerja Expressive (Neural) - Hinglish Female',
+    language: 'hinglish',
+    locale: 'en-IN',
+    gender: 'Female',
+    provider: 'edge-tts',
+    accent: 'Hinglish (India)',
+    isDefault: true,
+  },
+  {
+    id: 'hinglish-IN-PrabhatNeural',
+    name: 'Prabhat (Hinglish)',
+    friendlyName: 'Prabhat (Neural) - Hinglish Male',
+    language: 'hinglish',
+    locale: 'en-IN',
+    gender: 'Male',
+    provider: 'edge-tts',
+    accent: 'Hinglish (India)',
   },
   // English (India)
   {
@@ -119,11 +142,11 @@ export class EdgeTTSProvider implements ITTSProvider {
   readonly description = 'Natural neural voices with pitch and speed control (Free, No API Key required)';
 
   getSupportedLanguages(): SupportedLanguage[] {
-    return ['hi', 'en', 'bho'];
+    return ['hi', 'en', 'bho', 'hinglish'];
   }
 
   supportsLanguage(language: string): boolean {
-    return language === 'hi' || language === 'en' || language === 'bho';
+    return language === 'hi' || language === 'en' || language === 'bho' || language === 'hinglish';
   }
 
   async getVoices(language?: SupportedLanguage): Promise<TTSVoice[]> {
@@ -149,22 +172,37 @@ export class EdgeTTSProvider implements ITTSProvider {
     const validVoice = availableVoices.find((v) => v.id === request.voice);
     const voiceToUse: string = validVoice ? validVoice.id : (availableVoices.find((v) => v.isDefault)?.id || availableVoices[0].id);
 
-    // Map Bhojpuri aliases to underlying Devanagari neural models
+    // Map Bhojpuri and Hinglish aliases to underlying neural models
     let engineVoice = voiceToUse;
     if (engineVoice === 'bho-IN-SwaraNeural') engineVoice = 'hi-IN-SwaraNeural';
     if (engineVoice === 'bho-IN-MadhurNeural') engineVoice = 'hi-IN-MadhurNeural';
+    if (engineVoice === 'hinglish-IN-NeerjaNeural') engineVoice = 'en-IN-NeerjaExpressiveNeural';
+    if (engineVoice === 'hinglish-IN-PrabhatNeural') engineVoice = 'en-IN-PrabhatNeural';
+
+    // Apply emotion profile if provided
+    const emotionKey = (request.emotion as SpeakingEmotion) || 'natural';
+    const profile = EMOTION_PROFILES[emotionKey] || EMOTION_PROFILES.natural;
+
+    // Enhance text with natural human breathing, cadence, and pauses
+    const processedText = request.naturalPause !== false
+      ? humanizeSpeechText(text, language, emotionKey)
+      : text.trim();
+
+    // Calculate effective speed and pitch factoring in emotion
+    const effectiveSpeed = Math.max(0.5, Math.min(2.0, speed * profile.speedMultiplier));
+    const effectivePitch = Math.max(-50, Math.min(50, pitch + profile.pitchOffset));
 
     // Format speed rate percentage (e.g. 1.0 => 0%, 1.25 => +25%, 0.75 => -25%)
-    const ratePct = Math.round((Math.max(0.5, Math.min(2.0, speed)) - 1.0) * 100);
+    const ratePct = Math.round((effectiveSpeed - 1.0) * 100);
     const rateStr = `${ratePct >= 0 ? '+' : ''}${ratePct}%`;
 
     // Format pitch in Hz (e.g. -20 to +20 Hz)
-    const clampedPitch = Math.round(Math.max(-50, Math.min(50, pitch)));
+    const clampedPitch = Math.round(effectivePitch);
     const pitchStr = `${clampedPitch >= 0 ? '+' : ''}${clampedPitch}Hz`;
 
     try {
       const tts = new EdgeTTS();
-      await tts.synthesize(text.trim(), engineVoice, {
+      await tts.synthesize(processedText, engineVoice, {
         rate: rateStr,
         pitch: pitchStr,
       });

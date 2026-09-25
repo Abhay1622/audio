@@ -35,7 +35,7 @@ export const AudioResultCard: React.FC<AudioResultCardProps> = ({
     if (!audioData) return;
     const a = document.createElement('a');
     a.href = audioData.audioUrl;
-    const langSlug = audioData.language === 'hi' ? 'hindi' : audioData.language === 'bho' ? 'bhojpuri' : 'english';
+    const langSlug = audioData.language === 'hi' ? 'hindi' : audioData.language === 'bho' ? 'bhojpuri' : audioData.language === 'hinglish' ? 'hinglish' : 'english';
     const voiceSlug = (audioData.voiceName || 'voice').toLowerCase().replace(/[^a-z0-9]/g, '-');
     a.download = `voicecraft-${langSlug}-${voiceSlug}.${audioData.format}`;
     document.body.appendChild(a);
@@ -160,6 +160,8 @@ export const AudioResultCard: React.FC<AudioResultCardProps> = ({
                         ? '🇮🇳 Hindi (हिन्दी)'
                         : audioData.language === 'bho'
                         ? '🌾 Bhojpuri (भोजपुरी)'
+                        : audioData.language === 'hinglish'
+                        ? '🇮🇳 Hinglish (Roman)'
                         : '🌐 English'}
                     </span>
                   </span>

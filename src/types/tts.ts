@@ -1,4 +1,4 @@
-export type SupportedLanguage = 'hi' | 'en' | 'bho';
+export type SupportedLanguage = 'hi' | 'en' | 'bho' | 'hinglish';
 
 export type VoiceGender = 'Male' | 'Female' | 'Neutral';
 
@@ -21,6 +21,8 @@ export interface TTSGenerateRequest {
   speed?: number; // 0.5 to 2.0, default 1.0
   pitch?: number; // -50 to 50 Hz, default 0
   provider?: 'edge-tts' | 'google-tts' | 'browser';
+  emotion?: string; // 'natural' | 'cheerful' | 'storyteller' | 'empathetic' | 'formal' | 'whispering'
+  naturalPause?: boolean;
 }
 
 export interface TTSGenerateResult {

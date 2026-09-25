@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { text, language, voice, speed = 1.0, pitch = 0, provider } = body;
+    const { text, language, voice, speed = 1.0, pitch = 0, provider, emotion, naturalPause } = body;
 
     // Validate text
     if (!text || typeof text !== 'string' || text.trim().length === 0) {
@@ -55,13 +55,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate language
-    if (language !== 'hi' && language !== 'en' && language !== 'bho') {
+    if (language !== 'hi' && language !== 'en' && language !== 'bho' && language !== 'hinglish') {
       return NextResponse.json<TTSApiResponse>(
         {
           success: false,
           error: {
             code: 'UNSUPPORTED_LANGUAGE',
-            message: `Unsupported language '${language}'. VoiceCraft supports 'hi' (Hindi), 'en' (English), and 'bho' (Bhojpuri).`,
+            message: `Unsupported language '${language}'. VoiceCraft supports 'hi' (Hindi), 'bho' (Bhojpuri), 'hinglish' (Hinglish), and 'en' (English).`,
           },
         },
         { status: 400 }
@@ -79,6 +79,8 @@ export async function POST(req: NextRequest) {
       speed: numSpeed,
       pitch: numPitch,
       provider,
+      emotion: typeof emotion === 'string' ? emotion : undefined,
+      naturalPause: typeof naturalPause === 'boolean' ? naturalPause : true,
     });
 
     const audioUrl = `/api/tts/audio/${result.audioId}`;

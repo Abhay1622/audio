@@ -13,7 +13,7 @@ export const Hero: React.FC = () => {
       {/* Pill tag */}
       <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-violet-50 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300 border border-violet-200/80 dark:border-violet-800/60 text-xs font-semibold mb-4 shadow-sm">
         <Sparkles className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
-        <span>Free to run locally • Hindi, Bhojpuri &amp; English • Audio Generation</span>
+        <span>Free to run locally • Hindi, Bhojpuri, Hinglish &amp; English • Audio Generation</span>
       </div>
 
       {/* Heading */}
@@ -26,7 +26,7 @@ export const Hero: React.FC = () => {
 
       {/* Subtitle */}
       <p className="mt-3 text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
-        Generate Hindi, Bhojpuri, and English audio using free and open-source speech technology.
+        Generate Hindi, Bhojpuri, Hinglish, and English audio using free and open-source speech technology.
       </p>
 
       {/* Micro feature pills */}

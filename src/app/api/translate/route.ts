@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { translateSingle } from '@/lib/translate';
+import { translateAllLanguages } from '@/lib/translate';
 import { SupportedLanguage } from '@/types/tts';
 
 export const dynamic = 'force-dynamic';
@@ -13,35 +13,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'Invalid JSON request body.' }, { status: 400 });
     }
 
-    const { text, sourceLang, targetLangs } = body;
+    const { text, sourceLang } = body;
 
     if (!text || typeof text !== 'string' || text.trim().length === 0) {
-      return NextResponse.json({ success: true, translations: {} });
+      return NextResponse.json({
+        success: true,
+        translations: { hi: '', bho: '', hinglish: '', en: '' },
+        detectedSource: sourceLang || 'hi',
+      });
     }
 
     const validSource = (sourceLang as SupportedLanguage) || 'hi';
-    const targets: SupportedLanguage[] = Array.isArray(targetLangs)
-      ? targetLangs
-      : (['hi', 'bho', 'en'] as SupportedLanguage[]).filter((l) => l !== validSource);
-
-    const translations: Record<string, string> = {};
-
-    await Promise.all(
-      targets.map(async (tl) => {
-        try {
-          const res = await translateSingle(text, validSource, tl);
-          translations[tl] = res;
-        } catch (err) {
-          console.warn(`Translation error for ${tl}:`, err);
-          translations[tl] = text; // Graceful fallback
-        }
-      })
-    );
+    const result = await translateAllLanguages(text, validSource);
 
     return NextResponse.json({
       success: true,
-      translations,
-      sourceLang: validSource,
+      translations: result.translations,
+      detectedSource: result.detectedSource,
+      requestedSource: validSource,
     });
   } catch (error: unknown) {
     console.error('Translation Route Error:', error);

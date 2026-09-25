@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { TTSVoice } from '@/types/tts';
-import { User, Gauge, Sliders, Server, Sparkles } from 'lucide-react';
+import { SpeakingEmotion, EMOTION_PROFILES } from '@/lib/tts/humanizer';
+import { User, Gauge, Sliders, Server, Sparkles, HeartHandshake } from 'lucide-react';
 
 interface VoiceSettingsProps {
   voices: TTSVoice[];
@@ -14,6 +15,10 @@ interface VoiceSettingsProps {
   onPitchChange: (pitch: number) => void;
   selectedProvider: 'edge-tts' | 'google-tts' | 'browser';
   onProviderChange: (provider: 'edge-tts' | 'google-tts' | 'browser') => void;
+  selectedEmotion: SpeakingEmotion;
+  onEmotionChange: (emotion: SpeakingEmotion) => void;
+  naturalPause: boolean;
+  onNaturalPauseChange: (enabled: boolean) => void;
   disabled?: boolean;
 }
 
@@ -29,12 +34,57 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({
   onPitchChange,
   selectedProvider,
   onProviderChange,
+  selectedEmotion,
+  onEmotionChange,
+  naturalPause,
+  onNaturalPauseChange,
   disabled = false,
 }) => {
   return (
     <div className="space-y-4 pt-2">
+      {/* Emotion / Speaking Style Selector */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <label className="flex items-center space-x-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 tracking-wide uppercase">
+            <HeartHandshake className="w-3.5 h-3.5 text-pink-500" />
+            <span>Speaking Emotion &amp; Expression</span>
+          </label>
+          <span className="text-[11px] font-medium text-pink-600 dark:text-pink-400">
+            {EMOTION_PROFILES[selectedEmotion].label}
+          </span>
+        </div>
+
+        {/* Emotion Pills Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {Object.values(EMOTION_PROFILES).map((profile) => {
+            const isSelected = selectedEmotion === profile.id;
+            return (
+              <button
+                key={profile.id}
+                type="button"
+                disabled={disabled}
+                onClick={() => onEmotionChange(profile.id)}
+                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                  isSelected
+                    ? 'bg-violet-50/80 dark:bg-violet-950/40 border-violet-500 text-violet-950 dark:text-violet-100 ring-2 ring-violet-200 dark:ring-violet-900/40 shadow-sm'
+                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:border-violet-300'
+                } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                <div className="flex items-center space-x-1.5">
+                  <span className="text-base">{profile.icon}</span>
+                  <span className="text-xs font-bold truncate block">{profile.label}</span>
+                </div>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
+                  {profile.description}
+                </p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Voice Selection */}
-      <div className="space-y-1.5">
+      <div className="space-y-1.5 pt-1">
         <div className="flex items-center justify-between">
           <label
             htmlFor="voice-select"
@@ -68,6 +118,31 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({
             </svg>
           </div>
         </div>
+      </div>
+
+      {/* Natural Pause & Human Cadence Toggle */}
+      <div className="p-3 rounded-xl bg-violet-50/50 dark:bg-violet-950/20 border border-violet-200/60 dark:border-violet-800/40 flex items-center justify-between">
+        <div>
+          <div className="flex items-center space-x-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
+            <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+              Natural Human Breathing &amp; Pauses
+            </span>
+          </div>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+            Inserts human breath pauses and rhythm between clauses so speech doesn&apos;t sound robotic
+          </p>
+        </div>
+        <label className="relative inline-flex items-center cursor-pointer ml-3">
+          <input
+            type="checkbox"
+            checked={naturalPause}
+            disabled={disabled}
+            onChange={(e) => onNaturalPauseChange(e.target.checked)}
+            className="sr-only peer"
+          />
+          <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-violet-600"></div>
+        </label>
       </div>
 
       {/* Speed Rate Control */}
@@ -126,7 +201,7 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({
           <div className="flex items-center justify-between">
             <label className="flex items-center space-x-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 tracking-wide uppercase">
               <Sliders className="w-3.5 h-3.5 text-indigo-500" />
-              <span>Voice Pitch</span>
+              <span>Voice Pitch / Vocal Depth</span>
             </label>
             <span className="text-xs font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/60 px-2 py-0.5 rounded-md border border-violet-200 dark:border-violet-800">
               {pitch > 0 ? `+${pitch}Hz` : pitch < 0 ? `${pitch}Hz` : '0Hz (Default)'}
